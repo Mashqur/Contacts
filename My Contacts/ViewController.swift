@@ -51,6 +51,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         return [delete]
     }
     
+    // MARK: Table view row selection
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let callMessageAlert = UIAlertController(title: "Choose", message: "", preferredStyle: .alert)
         let actionCall = UIAlertAction(title: "CALL", style: .default, handler: { (ACTION) -> Void in
@@ -82,7 +83,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         self.contactListTable.reloadData()
         controller.dismiss(animated: true, completion: nil)
     }
-
+    // MARK: ADD NEW CONTACT
     @IBAction func addContact(_ sender: UIButton) {
         
         let addContactAlert = UIAlertController(title: "New Contact", message: "Write Name and Number", preferredStyle: .alert)
@@ -121,7 +122,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             print(error)
         }
     }
-    
+    //MARK: DELETE ALERT
     func deleteMessageAlert(indexPath: Any){
         let messageAlert = UIAlertController(title: "Delete?", message: "Do you want to delete", preferredStyle: .alert)
         messageAlert.addAction(UIAlertAction(title: "NO", style: .default, handler: nil))
@@ -129,6 +130,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         present(messageAlert, animated: true, completion: nil)
     }
     
+    // MARK: PERFORM DELETE CONTACT
     func performDelte(indexPath: Any){
         context?.delete(indexPath as! NSManagedObject)
         (UIApplication.shared.delegate as! AppDelegate).saveContext()

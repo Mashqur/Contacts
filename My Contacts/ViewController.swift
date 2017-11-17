@@ -10,17 +10,23 @@ import UIKit
 import  CoreData
 import MessageUI
 
-class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, MFMessageComposeViewControllerDelegate {
+class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, MFMessageComposeViewControllerDelegate , UISearchBarDelegate{
 
     @IBOutlet weak var contactListTable: UITableView!
+    @IBOutlet weak var searchContact: UISearchBar!
     var context = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext
     var contacts : [Contacts] = []
+    var searchData: [Contacts] = []
+    var isSearching = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
         contactListTable.delegate = self
         contactListTable.dataSource = self
+        searchContact.delegate = self
+        //searchContact.returnKeyType = UIReturnKeyType.done
         fetchContacts()
+        //contactListTable.reloadData()
     }
 
     override func didReceiveMemoryWarning() {
@@ -33,13 +39,22 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return contacts.count
+        if isSearching{
+            return searchData.count
+        }else{
+            return contacts.count
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = contactListTable.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! ContactCell
+        if isSearching{
+            cell.name.text = searchData[indexPath.row].name
+            cell.number.text = searchData[indexPath.row].number
+        }else{
         cell.name.text = contacts[indexPath.row].name
         cell.number.text = contacts[indexPath.row].number
+        }
         return cell
     }
     
@@ -113,14 +128,17 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         present(addContactAlert, animated: true, completion: nil)
     }
     
-    func fetchContacts(){
-        do{
-            contacts = try self.context!.fetch(Contacts.fetchRequest())
-            self.contactListTable.reloadData()
-        }
-        catch{
-            print(error)
-        }
+    func fetchContacts(targetText: String?=nil){
+  
+            do{
+                contacts = try self.context!.fetch(Contacts.fetchRequest())
+                self.contactListTable.reloadData()
+            }
+            catch{
+                print(error)
+            }
+
+        
     }
     //MARK: DELETE ALERT
     func deleteMessageAlert(indexPath: Any){
@@ -136,5 +154,45 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         (UIApplication.shared.delegate as! AppDelegate).saveContext()
         fetchContacts()
     }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if(searchText.isEmpty){
+            isSearching = false
+            fetchContacts()
+            //view.endEditing(true)
+            contactListTable.reloadData()
+        }else{
+            isSearching = true
+            let query: NSFetchRequest<Contacts> = Contacts.fetchRequest()
+            //let key = "alex"
+            
+            let predicate = NSPredicate(format: "name contains[c] %@", searchText)
+            query.predicate = predicate
+            
+            do{
+                searchData = try context!.fetch(query)
+                contactListTable.reloadData()
+                
+            }catch{
+                print("error")
+            }
+        }
+    }
+    
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        fetchContacts()
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        isSearching = false
+        searchContact.resignFirstResponder()
+        searchContact.showsCancelButton = false
+        searchContact.text = ""
+    }
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        searchContact.showsCancelButton = true
+    }
+    
 }
 

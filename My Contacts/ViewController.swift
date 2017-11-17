@@ -24,9 +24,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         contactListTable.delegate = self
         contactListTable.dataSource = self
         searchContact.delegate = self
-        //searchContact.returnKeyType = UIReturnKeyType.done
         fetchContacts()
-        //contactListTable.reloadData()
     }
 
     override func didReceiveMemoryWarning() {
@@ -137,8 +135,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             catch{
                 print(error)
             }
-
-        
     }
     //MARK: DELETE ALERT
     func deleteMessageAlert(indexPath: Any){
@@ -159,13 +155,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         if(searchText.isEmpty){
             isSearching = false
             fetchContacts()
-            //view.endEditing(true)
             contactListTable.reloadData()
         }else{
             isSearching = true
             let query: NSFetchRequest<Contacts> = Contacts.fetchRequest()
-            //let key = "alex"
-            
             let predicate = NSPredicate(format: "name contains[c] %@", searchText)
             query.predicate = predicate
             
@@ -195,4 +188,3 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
 }
-

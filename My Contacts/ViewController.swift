@@ -58,7 +58,11 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         let delete = UITableViewRowAction(style: .normal, title: "Delete", handler: { action, index in
-            self.deleteMessageAlert(indexPath: self.contacts[indexPath.row])
+            if self.isSearching {
+                self.deleteMessageAlert(indexPath: self.searchData[indexPath.row])
+            }else{
+                self.deleteMessageAlert(indexPath: self.contacts[indexPath.row])
+            }
         })
         delete.backgroundColor = UIColor.gray
         return [delete]
@@ -185,6 +189,5 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         searchContact.showsCancelButton = true
-    }
-    
+    }    
 }
